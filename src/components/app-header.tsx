@@ -1,20 +1,24 @@
 'use client';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/providers/auth-provider';
-import { auth } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { DollarSign, LogOut } from 'lucide-react';
+import { DollarSign, LogOut, LayoutDashboard, FileText, UserPlus } from 'lucide-react';
+
+const mockUser = {
+  displayName: 'Test User',
+  email: 'test@example.com',
+  photoURL: '',
+};
 
 export function AppHeader() {
-  const { user } = useAuth();
   const router = useRouter();
 
   const handleLogout = async () => {
-    await auth.signOut();
-    router.push('/login');
+    // In a real app, this would sign the user out.
+    // For now, it just redirects to the landing page.
+    router.push('/');
   };
 
   const getInitials = (name?: string | null) => {
@@ -33,31 +37,38 @@ export function AppHeader() {
         <span className="ml-2 text-xl font-bold font-headline">BillBling</span>
       </Link>
       <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
-        {user && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                <Avatar className="h-10 w-10 border-2 border-primary/50">
-                  <AvatarImage src={user.photoURL || ''} alt={user.displayName || 'User'} />
-                  <AvatarFallback className="bg-primary/20">{getInitials(user.displayName)}</AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end" forceMount>
-              <DropdownMenuLabel className="font-normal">
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">{user.displayName}</p>
-                  <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout}>
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+        <Button variant="ghost" size="sm" asChild>
+            <Link href="/dashboard"><LayoutDashboard className="mr-2"/>Dashboard</Link>
+        </Button>
+         <Button variant="ghost" size="sm" asChild>
+            <Link href="/bills"><FileText className="mr-2"/>All Bills</Link>
+        </Button>
+         <Button variant="ghost" size="sm" asChild>
+            <Link href="/group"><UserPlus className="mr-2"/>Group</Link>
+        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+              <Avatar className="h-10 w-10 border-2 border-primary/50">
+                <AvatarImage src={mockUser.photoURL || ''} alt={mockUser.displayName || 'User'} />
+                <AvatarFallback className="bg-primary/20">{getInitials(mockUser.displayName)}</AvatarFallback>
+              </Avatar>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56" align="end" forceMount>
+            <DropdownMenuLabel className="font-normal">
+              <div className="flex flex-col space-y-1">
+                <p className="text-sm font-medium leading-none">{mockUser.displayName}</p>
+                <p className="text-xs leading-none text-muted-foreground">{mockUser.email}</p>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleLogout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Log out</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </nav>
     </header>
   );

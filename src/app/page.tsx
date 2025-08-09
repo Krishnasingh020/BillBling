@@ -6,17 +6,19 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       <header className="px-4 lg:px-6 h-16 flex items-center bg-background/80 backdrop-blur-sm sticky top-0 z-50 border-b">
-        <Link href="/" className="flex items-center justify-center" prefetch={false}>
+        <Link href="/dashboard" className="flex items-center justify-center" prefetch={false}>
           <DollarSign className="h-6 w-6 text-primary" />
           <span className="ml-2 text-xl font-bold font-headline">BillBling</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link href="/login" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
-            Login
-          </Link>
+           <Button asChild variant="ghost">
+            <Link href="/dashboard" prefetch={false}>
+              Dashboard
+            </Link>
+          </Button>
           <Button asChild>
-            <Link href="/signup" prefetch={false}>
-              Sign Up
+            <Link href="/dashboard" prefetch={false}>
+              Get Started
             </Link>
           </Button>
         </nav>
@@ -37,7 +39,7 @@ export default function Home() {
                 </div>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
                   <Button asChild size="lg">
-                    <Link href="/signup" prefetch={false}>
+                    <Link href="/dashboard" prefetch={false}>
                       Get Started for Free
                     </Link>
                   </Button>

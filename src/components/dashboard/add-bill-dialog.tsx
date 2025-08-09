@@ -13,7 +13,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PlusCircle, Loader2 } from 'lucide-react';
-import { useAuth } from '@/providers/auth-provider';
 import { useToast } from '@/hooks/use-toast';
 import { autoBillTagging } from '@/ai/flows/bill-tagging';
 import type { UserProfile, Bill } from '@/types';
@@ -25,7 +24,6 @@ interface AddBillDialogProps {
 }
 
 export function AddBillDialog({ members, groupId, onBillAdded }: AddBillDialogProps) {
-  const { user } = useAuth();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [description, setDescription] = useState('');
@@ -33,6 +31,7 @@ export function AddBillDialog({ members, groupId, onBillAdded }: AddBillDialogPr
   const [category, setCategory] = useState('');
   const [loading, setLoading] = useState(false);
   const [isTagging, setIsTagging] = useState(false);
+  const currentUserId = 'user-1'; // Use mock user
 
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -50,7 +49,6 @@ export function AddBillDialog({ members, groupId, onBillAdded }: AddBillDialogPr
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const currentUserId = user?.uid || 'user-1'; // Use mock user if not logged in
     if (!groupId || !amount || !description) return;
     setLoading(true);
 
@@ -68,11 +66,8 @@ export function AddBillDialog({ members, groupId, onBillAdded }: AddBillDialogPr
 
         if (onBillAdded) {
             onBillAdded(newBill);
-        } else {
-            // This path would be used if we were writing to Firestore
-            // For now, we are using the onBillAdded callback for mock data
         }
-
+      
       toast({ title: 'Bill added!', description: `${description} for $${amount} has been added.` });
       setOpen(false);
       setDescription('');
