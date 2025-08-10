@@ -1,8 +1,28 @@
+'use client';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { DollarSign, Users, PieChart } from 'lucide-react';
+import { DollarSign, Users, PieChart, Loader2 } from 'lucide-react';
+import { generateImage } from '@/ai/flows/generate-image-flow';
 
 export default function Home() {
+  const [heroImageUrl, setHeroImageUrl] = useState("https://placehold.co/600x600.png");
+  const [isLoadingImage, setIsLoadingImage] = useState(true);
+
+  useEffect(() => {
+    generateImage({ prompt: "A modern, abstract illustration for a financial app, representing collaboration and splitting bills. Use a clean, friendly color palette with soft, rounded shapes. The style should be minimalist and approachable, conveying ease of use and trust." })
+      .then(result => {
+        setHeroImageUrl(result.imageUrl);
+      })
+      .catch(error => {
+        console.error("Failed to generate hero image:", error);
+      })
+      .finally(() => {
+        setIsLoadingImage(false);
+      });
+  }, []);
+
+
   return (
     <div className="flex flex-col min-h-screen">
       <header className="px-4 lg:px-6 h-16 flex items-center bg-background/80 backdrop-blur-sm sticky top-0 z-50 border-b">
@@ -45,14 +65,22 @@ export default function Home() {
                   </Button>
                 </div>
               </div>
-              <img
-                src="https://placehold.co/600x600.png"
-                data-ai-hint="finance app illustration"
-                width="600"
-                height="600"
-                alt="Hero"
-                className="mx-auto aspect-square overflow-hidden rounded-xl object-cover sm:w-full lg:order-last"
-              />
+               <div className="mx-auto aspect-square overflow-hidden rounded-xl flex items-center justify-center bg-muted/50">
+                {isLoadingImage ? (
+                  <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                    <Loader2 className="h-10 w-10 animate-spin" />
+                    <p>Generating illustration...</p>
+                  </div>
+                ) : (
+                  <img
+                    src={heroImageUrl}
+                    width="600"
+                    height="600"
+                    alt="Hero"
+                    className="object-cover w-full h-full"
+                  />
+                )}
+              </div>
             </div>
           </div>
         </section>
