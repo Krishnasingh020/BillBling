@@ -77,31 +77,34 @@ export default function BalancesPage() {
         const creditors = members.filter(m => memberBalances[m.uid].net > 0);
         const simplifiedDebts: { from: string, to: string, amount: number }[] = [];
         
+        // Create mutable copies for calculation
+        const mutableBalances = JSON.parse(JSON.stringify(memberBalances));
+
         // Sort for consistent results
-        debtors.sort((a, b) => memberBalances[a.uid].net - memberBalances[b.uid].net);
-        creditors.sort((a, b) => memberBalances[b.uid].net - memberBalances[a.uid].net);
+        debtors.sort((a, b) => mutableBalances[a.uid].net - mutableBalances[b.uid].net);
+        creditors.sort((a, b) => mutableBalances[b.uid].net - mutableBalances[a.uid].net);
 
         let i = 0, j = 0;
         while (i < debtors.length && j < creditors.length) {
             const debtorId = debtors[i].uid;
             const creditorId = creditors[j].uid;
-            const debt = Math.abs(memberBalances[debtorId].net);
-            const credit = memberBalances[creditorId].net;
+            const debt = Math.abs(mutableBalances[debtorId].net);
+            const credit = mutableBalances[creditorId].net;
             const settlement = Math.min(debt, credit);
 
             if (settlement > 0.01) { // Threshold to avoid tiny floating point settlements
                 simplifiedDebts.push({
-                    from: debtors[i].displayName,
-                    to: creditors[j].displayName,
+                    from: members.find(m => m.uid === debtorId)?.displayName || 'Unknown',
+                    to: members.find(m => m.uid === creditorId)?.displayName || 'Unknown',
                     amount: settlement
                 });
 
-                memberBalances[debtorId].net += settlement;
-                memberBalances[creditorId].net -= settlement;
+                mutableBalances[debtorId].net += settlement;
+                mutableBalances[creditorId].net -= settlement;
             }
 
-            if (Math.abs(memberBalances[debtorId].net) < 0.01) i++;
-            if (Math.abs(memberBalances[creditorId].net) < 0.01) j++;
+            if (Math.abs(mutableBalances[debtorId].net) < 0.01) i++;
+            if (Math.abs(mutableBalances[creditorId].net) < 0.01) j++;
         }
 
         return {
@@ -112,8 +115,6 @@ export default function BalancesPage() {
 
     }, [bills, members]);
     
-    const getMemberName = (uid: string) => members.find(m => m.uid === uid)?.displayName || 'Unknown';
-
     return (
         <div className="container mx-auto p-4 md:p-6 lg:p-8">
             <Card className="mb-8">
@@ -130,7 +131,7 @@ export default function BalancesPage() {
                             {simplifiedDebts.map((debt, i) => (
                                 <div key={i} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
                                     <div className="flex items-center font-medium">
-                                        <span className='font-bold text-primary'>{debt.from}</span>
+                                        <span className='font-bold text-red-600'>{debt.from}</span>
                                         <ArrowRight className="mx-4 h-5 w-5 text-muted-foreground" />
                                         <span className='font-bold text-green-600'>{debt.to}</span>
                                     </div>
@@ -156,8 +157,8 @@ export default function BalancesPage() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Member</TableHead>
-                                <TableHead className="text-right">Total Paid</TableHead>
-                                <TableHead className="text-right">Total Share</TableHead>
+                                <TableHead className="text-right">Total Paid (Credit)</TableHead>
+                                <TableHead className="text-right">Total Share (Debit)</TableHead>
                                 <TableHead className="text-right">Net Balance</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -173,7 +174,7 @@ export default function BalancesPage() {
                                     <TableCell className="text-right text-green-600 font-medium">+${memberBalances[member.uid].paid.toFixed(2)}</TableCell>
                                     <TableCell className="text-right text-red-600 font-medium">-${memberBalances[member.uid].owed.toFixed(2)}</TableCell>
                                     <TableCell className={`text-right font-bold ${memberBalances[member.uid].net >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                        {memberBalances[member.uid].net >= 0 ? '+' : '-'}${Math.abs(memberBalances[member.uid].net).toFixed(2)}
+                                        {memberBalances[member.uid].net >= 0 ? '+' : ''}${Math.abs(memberBalances[member.uid].net).toFixed(2)}
                                     </TableCell>
                                 </TableRow>
                             ))}
