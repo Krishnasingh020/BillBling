@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { DollarSign, LogOut, LayoutDashboard, FileText, UserPlus } from 'lucide-react';
+import { DollarSign, LogOut, LayoutDashboard, FileText, UserPlus, Scale } from 'lucide-react';
 
 const mockUser = {
   displayName: 'Test User',
@@ -42,6 +42,9 @@ export function AppHeader() {
         </Button>
          <Button variant="ghost" size="sm" asChild>
             <Link href="/bills"><FileText className="mr-2"/>All Bills</Link>
+        </Button>
+         <Button variant="ghost" size="sm" asChild>
+            <Link href="/balances"><Scale className="mr-2"/>Balances</Link>
         </Button>
          <Button variant="ghost" size="sm" asChild>
             <Link href="/group"><UserPlus className="mr-2"/>Group</Link>

@@ -39,11 +39,12 @@ export function AddBillDialog({ members, groupId, onBillAdded }: AddBillDialogPr
   const currentUserId = 'user-1'; // Mock user
 
   useEffect(() => {
-    if (members.length > 0) {
+    if (members.length > 0 && open) {
       setPaidBy(currentUserId);
       setParticipants(members.map(m => m.uid));
     }
-  }, [members]);
+  }, [members, open, currentUserId]);
+
 
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -65,8 +66,8 @@ export function AddBillDialog({ members, groupId, onBillAdded }: AddBillDialogPr
     );
   }
 
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
+  const handleSelectAll = (checked: boolean | 'indeterminate') => {
+    if (checked === true) {
       setParticipants(members.map(m => m.uid));
     } else {
       setParticipants([]);
@@ -110,6 +111,10 @@ export function AddBillDialog({ members, groupId, onBillAdded }: AddBillDialogPr
       setLoading(false);
     }
   };
+
+  const areAllSelected = participants.length === members.length;
+  const areSomeSelected = participants.length > 0 && participants.length < members.length;
+
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -177,7 +182,7 @@ export function AddBillDialog({ members, groupId, onBillAdded }: AddBillDialogPr
                     <div className="flex items-center space-x-2 pb-2 border-b mb-2">
                         <Checkbox 
                             id="select-all" 
-                            checked={participants.length === members.length}
+                            checked={areAllSelected || areSomeSelected === true && 'indeterminate'}
                             onCheckedChange={handleSelectAll}
                         />
                         <Label htmlFor="select-all" className='font-medium'>Select All</Label>

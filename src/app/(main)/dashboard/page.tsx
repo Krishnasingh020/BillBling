@@ -17,15 +17,16 @@ const mockUsers: UserProfile[] = [
   { uid: 'user-1', displayName: 'Alex', email: 'alex@example.com', groupId: 'group-1' },
   { uid: 'user-2', displayName: 'Beth', email: 'beth@example.com', groupId: 'group-1' },
   { uid: 'user-3', displayName: 'Charlie', email: 'charlie@example.com', groupId: 'group-1' },
+  { uid: 'user-4', displayName: 'David', email: 'david@example.com', groupId: 'group-1' },
 ];
 
 const mockCurrentUser = mockUsers[0];
 
 const initialMockBills: Omit<Bill, 'id' | 'createdAt'>[] = [
-  { groupId: 'group-1', description: 'Monthly Rent', amount: 1200, paidBy: 'user-1', participants: ['user-1', 'user-2', 'user-3'], category: 'Rent' },
-  { groupId: 'group-1', description: 'Internet Bill', amount: 60, paidBy: 'user-2', participants: ['user-1', 'user-2', 'user-3'], category: 'Internet' },
-  { groupId: 'group-1', description: 'Groceries', amount: 150, paidBy: 'user-3', participants: ['user-1', 'user-2', 'user-3'], category: 'Groceries' },
-  { groupId: 'group-1', description: 'Electricity', amount: 85, paidBy: 'user-1', participants: ['user-1', 'user-2', 'user-3'], category: 'Utilities' },
+  { groupId: 'group-1', description: 'Monthly Rent', amount: 1200, paidBy: 'user-1', participants: ['user-1', 'user-2', 'user-3', 'user-4'], category: 'Rent' },
+  { groupId: 'group-1', description: 'Internet Bill', amount: 60, paidBy: 'user-2', participants: ['user-1', 'user-2', 'user-3', 'user-4'], category: 'Internet' },
+  { groupId: 'group-1', description: 'Groceries', amount: 150, paidBy: 'user-3', participants: ['user-1', 'user-2', 'user-3', 'user-4'], category: 'Groceries' },
+  { groupId: 'group-1', description: 'Electricity', amount: 85, paidBy: 'user-1', participants: ['user-1', 'user-2', 'user-3', 'user-4'], category: 'Utilities' },
   { groupId: 'group-1', description: 'Dinner Out', amount: 90, paidBy: 'user-2', participants: ['user-1', 'user-2'], category: 'Food' },
 ];
 
