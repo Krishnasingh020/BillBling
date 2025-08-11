@@ -5,15 +5,11 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DollarSign, LogOut, LayoutDashboard, FileText, UserPlus, Scale } from 'lucide-react';
-
-const mockUser = {
-  displayName: 'Test User',
-  email: 'test@example.com',
-  photoURL: '',
-};
+import { useGroup } from '@/providers/group-provider';
 
 export function AppHeader() {
   const router = useRouter();
+  const { user } = useGroup();
 
   const handleLogout = async () => {
     // In a real app, this would sign the user out.
@@ -53,16 +49,16 @@ export function AppHeader() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10 rounded-full">
               <Avatar className="h-10 w-10 border-2 border-primary/50">
-                <AvatarImage src={mockUser.photoURL || ''} alt={mockUser.displayName || 'User'} />
-                <AvatarFallback className="bg-primary/20">{getInitials(mockUser.displayName)}</AvatarFallback>
+                <AvatarImage src={''} alt={user.displayName || 'User'} />
+                <AvatarFallback className="bg-primary/20">{getInitials(user.displayName)}</AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56" align="end" forceMount>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{mockUser.displayName}</p>
-                <p className="text-xs leading-none text-muted-foreground">{mockUser.email}</p>
+                <p className="text-sm font-medium leading-none">{user.displayName}</p>
+                <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />

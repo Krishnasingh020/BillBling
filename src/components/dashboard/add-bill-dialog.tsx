@@ -18,15 +18,17 @@ import { autoBillTagging } from '@/ai/flows/bill-tagging';
 import type { UserProfile, Bill } from '@/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useGroup } from '@/providers/group-provider';
 
 interface AddBillDialogProps {
   members: UserProfile[];
   groupId: string;
-  onBillAdded?: (bill: Omit<Bill, 'id'>) => void;
+  onBillAdded?: (bill: Omit<Bill, 'id' | 'createdAt'>) => void;
 }
 
 export function AddBillDialog({ members, groupId, onBillAdded }: AddBillDialogProps) {
   const { toast } = useToast();
+  const { user } = useGroup();
   const [open, setOpen] = useState(false);
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
@@ -36,7 +38,7 @@ export function AddBillDialog({ members, groupId, onBillAdded }: AddBillDialogPr
   const [loading, setLoading] = useState(false);
   const [isTagging, setIsTagging] = useState(false);
   
-  const currentUserId = 'user-1'; // Mock user
+  const currentUserId = user.uid;
 
   useEffect(() => {
     if (members.length > 0 && open) {
@@ -83,15 +85,13 @@ export function AddBillDialog({ members, groupId, onBillAdded }: AddBillDialogPr
     setLoading(true);
 
     try {
-        const newBill: Omit<Bill, 'id'> = {
+        const newBill: Omit<Bill, 'id' | 'createdAt'> = {
             groupId,
             description,
             amount: parseFloat(amount),
             category: category || 'Other',
             paidBy,
             participants,
-            // @ts-ignore
-            createdAt: new Date(), // In a real app, this would be a serverTimestamp
         };
 
         if (onBillAdded) {
@@ -100,6 +100,7 @@ export function AddBillDialog({ members, groupId, onBillAdded }: AddBillDialogPr
       
       toast({ title: 'Bill added!', description: `${description} for $${amount} has been added.` });
       setOpen(false);
+      // Reset form
       setDescription('');
       setAmount('');
       setCategory('');
@@ -112,7 +113,7 @@ export function AddBillDialog({ members, groupId, onBillAdded }: AddBillDialogPr
     }
   };
 
-  const areAllSelected = participants.length === members.length;
+  const areAllSelected = participants.length === members.length && members.length > 0;
   const areSomeSelected = participants.length > 0 && participants.length < members.length;
 
 
@@ -182,8 +183,8 @@ export function AddBillDialog({ members, groupId, onBillAdded }: AddBillDialogPr
                     <div className="flex items-center space-x-2 pb-2 border-b mb-2">
                         <Checkbox 
                             id="select-all" 
-                            checked={areAllSelected || areSomeSelected === true && 'indeterminate'}
-                            onCheckedChange={handleSelectAll}
+                            checked={areAllSelected || (areSomeSelected ? 'indeterminate' : false)}
+                            onCheckedChange={(checked) => handleSelectAll(checked as boolean)}
                         />
                         <Label htmlFor="select-all" className='font-medium'>Select All</Label>
                     </div>

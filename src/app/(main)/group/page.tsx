@@ -9,43 +9,56 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { useGroup } from "@/providers/group-provider";
 
 export default function GroupPage() {
     const router = useRouter();
     const { toast } = useToast();
+    const { createGroup, joinGroup } = useGroup();
+
     const [loadingCreate, setLoadingCreate] = useState(false);
     const [loadingJoin, setLoadingJoin] = useState(false);
-    const [groupName, setGroupName] = useState('The Fun House');
-    const [inviteCode, setInviteCode] = useState('FUN123');
+    const [groupName, setGroupName] = useState('');
+    const [inviteCode, setInviteCode] = useState('');
 
     const handleCreateGroup = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!groupName) return;
         setLoadingCreate(true);
-        // Mock creating a group
+        
+        // In a real app, this would be an API call.
+        // We'll simulate it with a timeout.
         setTimeout(() => {
-            toast({ title: "Group Created!", description: "You're all set up." });
+            createGroup(groupName);
+            toast({ title: "Group Created!", description: `Welcome to ${groupName}!` });
             router.push('/dashboard');
             setLoadingCreate(false);
-        }, 1000);
+        }, 500);
     };
     
     const handleJoinGroup = async (e: React.FormEvent) => {
         e.preventDefault();
+        if(!inviteCode) return;
         setLoadingJoin(true);
-        // Mock joining a group
+        
+        // In a real app, this would be an API call.
         setTimeout(() => {
-             toast({ title: "Joined Group!", description: `Welcome to The Fun House!` });
-             router.push('/dashboard');
+             const joinedGroup = joinGroup(inviteCode);
+             if (joinedGroup) {
+                toast({ title: "Joined Group!", description: `Welcome to ${joinedGroup.groupName}!` });
+                router.push('/dashboard');
+             } else {
+                toast({ variant: 'destructive', title: "Error", description: 'Invalid invite code.' });
+             }
              setLoadingJoin(false);
-        }, 1000);
+        }, 500);
     };
-
 
     return (
         <div className="container mx-auto max-w-lg py-12">
             <div className="text-center mb-6">
                 <h1 className="text-3xl font-bold">Manage Your Group</h1>
-                <p className="text-muted-foreground">Authentication is currently disabled for testing.</p>
+                <p className="text-muted-foreground">Create a new group or join one using an invite code.</p>
             </div>
             <Tabs defaultValue="create" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
@@ -84,7 +97,7 @@ export default function GroupPage() {
                             <CardContent className="space-y-4">
                                 <div className="space-y-1">
                                     <Label htmlFor="invite-code">Invite Code</Label>
-                                    <Input id="invite-code" value={inviteCode} onChange={e => setInviteCode(e.target.value)} placeholder="e.g. A1B2C3" required />
+                                    <Input id="invite-code" value={inviteCode} onChange={e => setInviteCode(e.target.value)} placeholder="e.g. FUN123" required />
                                 </div>
                             </CardContent>
                             <CardFooter>

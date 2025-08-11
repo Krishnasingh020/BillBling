@@ -1,60 +1,19 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { AddBillDialog } from '@/components/dashboard/add-bill-dialog';
 import type { Bill, UserProfile, Balance } from '@/types';
-import { Users, Receipt, Scale, MoreVertical } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Users, Receipt, Scale } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { format } from 'date-fns';
-import { v4 as uuidv4 } from 'uuid';
 import { SpendingChart } from '@/components/dashboard/spending-chart';
-
-// Mock Data
-const mockUsers: UserProfile[] = [
-  { uid: 'user-1', displayName: 'Alex', email: 'alex@example.com', groupId: 'group-1' },
-  { uid: 'user-2', displayName: 'Beth', email: 'beth@example.com', groupId: 'group-1' },
-  { uid: 'user-3', displayName: 'Charlie', email: 'charlie@example.com', groupId: 'group-1' },
-  { uid: 'user-4', displayName: 'David', email: 'david@example.com', groupId: 'group-1' },
-];
-
-const mockCurrentUser = mockUsers[0];
-
-const initialMockBills: Omit<Bill, 'id' | 'createdAt'>[] = [
-  { groupId: 'group-1', description: 'Monthly Rent', amount: 1200, paidBy: 'user-1', participants: ['user-1', 'user-2', 'user-3', 'user-4'], category: 'Rent' },
-  { groupId: 'group-1', description: 'Internet Bill', amount: 60, paidBy: 'user-2', participants: ['user-1', 'user-2', 'user-3', 'user-4'], category: 'Internet' },
-  { groupId: 'group-1', description: 'Groceries', amount: 150, paidBy: 'user-3', participants: ['user-1', 'user-2', 'user-3', 'user-4'], category: 'Groceries' },
-  { groupId: 'group-1', description: 'Electricity', amount: 85, paidBy: 'user-1', participants: ['user-1', 'user-2', 'user-3', 'user-4'], category: 'Utilities' },
-  { groupId: 'group-1', description: 'Dinner Out', amount: 90, paidBy: 'user-2', participants: ['user-1', 'user-2'], category: 'Food' },
-];
-
-const generateMockBills = (): Bill[] => {
-    return initialMockBills.map((bill, index) => ({
-        ...bill,
-        id: uuidv4(),
-        // @ts-ignore
-        createdAt: { toDate: () => new Date(Date.now() - index * 24 * 60 * 60 * 1000) },
-    }));
-};
-
+import { useGroup } from '@/providers/group-provider';
 
 export default function DashboardPage() {
-    const [group] = useState({ id: 'group-1', groupName: 'The Fun House', inviteCode: 'FUN123' });
-    const [bills, setBills] = useState<Bill[]>(generateMockBills());
-    const [members] = useState<UserProfile[]>(mockUsers);
-    const user = mockCurrentUser;
-    
-    const handleAddBill = (newBill: Omit<Bill, 'id'>) => {
-        const billWithDate: Bill = {
-            ...newBill,
-            id: uuidv4(),
-            // @ts-ignore
-            createdAt: { toDate: () => new Date() },
-        };
-        setBills(prevBills => [billWithDate, ...prevBills]);
-    };
+    const { group, bills, members, addBill, user } = useGroup();
 
     const balances = useMemo(() => {
         if (!user || members.length === 0) return { owedToMe: [], iOwe: [], groupTotal: 0, netBalances: {} };
@@ -65,17 +24,31 @@ export default function DashboardPage() {
     
         bills.forEach(bill => {
             groupTotal += bill.amount;
-            const share = bill.amount / bill.participants.length;
-            netBalances[bill.paidBy] += bill.amount;
-            bill.participants.forEach(participantId => {
-                netBalances[participantId] -= share;
-            });
+            if (bill.participants.length > 0) {
+              const share = bill.amount / bill.participants.length;
+              netBalances[bill.paidBy] += bill.amount;
+              bill.participants.forEach(participantId => {
+                  netBalances[participantId] -= share;
+              });
+            }
         });
         
         return { owedToMe: [], iOwe: [], groupTotal, netBalances };
     }, [bills, members, user]);
 
     const getPayerName = (uid: string) => members.find(m => m.uid === uid)?.displayName || 'Unknown';
+
+    if (!group) {
+      return (
+         <div className="container mx-auto p-4 md:p-6 lg:p-8 text-center">
+            <h1 className="text-2xl font-bold mb-4">Welcome to BillBling!</h1>
+            <p className="text-muted-foreground mb-6">To get started, create a new group or join an existing one.</p>
+            <Button asChild>
+                <Link href="/group">Get Started</Link>
+            </Button>
+        </div>
+      )
+    }
 
     return (
         <div className="container mx-auto p-4 md:p-6 lg:p-8">
@@ -86,7 +59,7 @@ export default function DashboardPage() {
                     </h1>
                      <p className="text-muted-foreground">Invite code: <span className="font-mono bg-muted px-2 py-1 rounded-md">{group?.inviteCode}</span></p>
                 </div>
-                <AddBillDialog members={members} groupId={group?.id || ''} onBillAdded={handleAddBill} />
+                <AddBillDialog members={members} groupId={group?.id || ''} onBillAdded={addBill} />
             </div>
             
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
@@ -107,7 +80,7 @@ export default function DashboardPage() {
                     </CardHeader>
                     <CardContent>
                         <div className={`text-2xl font-bold ${balances.netBalances?.[user?.uid || ''] >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                           {balances.netBalances?.[user?.uid || ''] >= 0 ? '+' : ''}${balances.netBalances?.[user?.uid || ''].toFixed(2)}
+                           {balances.netBalances?.[user?.uid || ''] >= 0 ? '+' : ''}${(balances.netBalances?.[user?.uid || ''] || 0).toFixed(2)}
                         </div>
                         <p className="text-xs text-muted-foreground">You are owed money if positive</p>
                     </CardContent>
@@ -120,8 +93,8 @@ export default function DashboardPage() {
                     <CardContent>
                         <div className="flex -space-x-2 overflow-hidden p-2">
                             {members.map(m => (
-                                <div key={m.uid} title={m.displayName} className="inline-block h-9 w-9 rounded-full ring-2 ring-background text-primary bg-primary/20 flex items-center justify-center font-bold">
-                                    {m.displayName.charAt(0).toUpperCase()}
+                                <div key={m.uid} title={m.displayName || ''} className="inline-block h-9 w-9 rounded-full ring-2 ring-background text-primary bg-primary/20 flex items-center justify-center font-bold">
+                                    {m.displayName?.charAt(0).toUpperCase()}
                                 </div>
                             ))}
                         </div>

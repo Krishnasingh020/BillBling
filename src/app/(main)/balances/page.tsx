@@ -1,41 +1,12 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import type { Bill, UserProfile } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ArrowRight, Scale } from 'lucide-react';
-import { v4 as uuidv4 } from 'uuid';
-
-// Extended Mock Data for better balance demonstration
-const mockUsers: UserProfile[] = [
-  { uid: 'user-1', displayName: 'Alex', email: 'alex@example.com', groupId: 'group-1' },
-  { uid: 'user-2', displayName: 'Beth', email: 'beth@example.com', groupId: 'group-1' },
-  { uid: 'user-3', displayName: 'Charlie', email: 'charlie@example.com', groupId: 'group-1' },
-  { uid: 'user-4', displayName: 'David', email: 'david@example.com', groupId: 'group-1' },
-];
-
-const initialMockBills: Omit<Bill, 'id' | 'createdAt'>[] = [
-    { groupId: 'group-1', description: 'Monthly Rent', amount: 1200, paidBy: 'user-1', participants: ['user-1', 'user-2', 'user-3', 'user-4'], category: 'Rent' },
-    { groupId: 'group-1', description: 'Internet Bill', amount: 60, paidBy: 'user-2', participants: ['user-1', 'user-2', 'user-3', 'user-4'], category: 'Internet' },
-    { groupId: 'group-1', description: 'Groceries', amount: 150, paidBy: 'user-3', participants: ['user-1', 'user-2', 'user-3', 'user-4'], category: 'Groceries' },
-    { groupId: 'group-1', description: 'Electricity', amount: 85, paidBy: 'user-1', participants: ['user-1', 'user-2', 'user-3', 'user-4'], category: 'Utilities' },
-    { groupId: 'group-1', description: 'Dinner Out', amount: 90, paidBy: 'user-2', participants: ['user-1', 'user-2'], category: 'Food' },
-    { groupId: 'group-1', description: 'Movie Tickets', amount: 45, paidBy: 'user-1', participants: ['user-1', 'user-3'], category: 'Entertainment' },
-    { groupId: 'group-1', description: 'Cleaning Supplies', amount: 30, paidBy: 'user-4', participants: ['user-1', 'user-2', 'user-3', 'user-4'], category: 'Shopping' },
-    { groupId: 'group-1', description: 'Weekend Trip Gas', amount: 50, paidBy: 'user-2', participants: ['user-1', 'user-2'], category: 'Travel' },
-];
-
-
-const generateMockBills = (): Bill[] => {
-    return initialMockBills.map((bill, index) => ({
-        ...bill,
-        id: uuidv4(),
-        // @ts-ignore
-        createdAt: { toDate: () => new Date(Date.now() - index * 24 * 60 * 60 * 1000) },
-    }));
-};
+import { useGroup } from '@/providers/group-provider';
 
 const getInitials = (name?: string | null) => {
     if (!name) return '?';
@@ -47,8 +18,7 @@ const getInitials = (name?: string | null) => {
 };
 
 export default function BalancesPage() {
-    const [bills] = useState<Bill[]>(generateMockBills());
-    const [members] = useState<UserProfile[]>(mockUsers);
+    const { bills, members } = useGroup();
 
     const { summary, memberBalances, simplifiedDebts } = useMemo(() => {
         const memberBalances: { [uid: string]: { paid: number, owed: number, net: number } } = {};
