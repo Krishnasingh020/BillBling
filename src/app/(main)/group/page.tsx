@@ -26,14 +26,15 @@ export default function GroupPage() {
         if (!groupName) return;
         setLoadingCreate(true);
         
-        // In a real app, this would be an API call.
-        // We'll simulate it with a timeout.
-        setTimeout(() => {
-            createGroup(groupName);
-            toast({ title: "Group Created!", description: `Welcome to ${groupName}!` });
+        try {
+            const newGroup = createGroup(groupName);
+            toast({ title: "Group Created!", description: `Welcome to ${newGroup.groupName}!` });
             router.push('/dashboard');
+        } catch (error) {
+            toast({ variant: 'destructive', title: "Error", description: 'Could not create group.' });
+        } finally {
             setLoadingCreate(false);
-        }, 500);
+        }
     };
     
     const handleJoinGroup = async (e: React.FormEvent) => {
@@ -41,8 +42,7 @@ export default function GroupPage() {
         if(!inviteCode) return;
         setLoadingJoin(true);
         
-        // In a real app, this would be an API call.
-        setTimeout(() => {
+        try {
              const joinedGroup = joinGroup(inviteCode);
              if (joinedGroup) {
                 toast({ title: "Joined Group!", description: `Welcome to ${joinedGroup.groupName}!` });
@@ -50,8 +50,11 @@ export default function GroupPage() {
              } else {
                 toast({ variant: 'destructive', title: "Error", description: 'Invalid invite code.' });
              }
-             setLoadingJoin(false);
-        }, 500);
+        } catch(error) {
+             toast({ variant: 'destructive', title: "Error", description: 'Could not join group.' });
+        } finally {
+            setLoadingJoin(false);
+        }
     };
 
     return (
