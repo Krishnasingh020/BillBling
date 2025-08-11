@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { Group, UserProfile, Bill } from "@/types";
@@ -7,6 +8,7 @@ import {
   useState,
   type ReactNode,
   useMemo,
+  useEffect,
 } from "react";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -29,16 +31,6 @@ const initialMockBills: Omit<Bill, 'id' | 'createdAt'>[] = [
   { groupId: 'group-1', description: 'Weekend Trip Gas', amount: 50, paidBy: 'user-2', participants: ['user-1', 'user-2'], category: 'Travel' },
 ];
 
-const generateMockBills = (groupId: string): Bill[] => {
-    return initialMockBills.map((bill, index) => ({
-        ...bill,
-        groupId,
-        id: uuidv4(),
-        // @ts-ignore
-        createdAt: { toDate: () => new Date(Date.now() - index * 24 * 60 * 60 * 1000) },
-    }));
-};
-
 const generateInviteCode = () => {
     return Math.random().toString(36).substring(2, 8).toUpperCase();
 }
@@ -58,6 +50,16 @@ const GroupContext = createContext<GroupContextType | null>(null);
 
 const MOCK_EXISTING_GROUP_ID = 'group-1';
 const MOCK_EXISTING_INVITE_CODE = 'FUN123';
+
+// Pre-generate mock bills to avoid re-calculating on each render
+const MOCK_BILLS = initialMockBills.map((bill, index) => ({
+    ...bill,
+    groupId: MOCK_EXISTING_GROUP_ID,
+    id: uuidv4(),
+    // @ts-ignore
+    createdAt: { toDate: () => new Date(Date.now() - index * 24 * 60 * 60 * 1000) },
+}));
+
 
 export const GroupProvider = ({ children }: { children: ReactNode }) => {
   const [group, setGroup] = useState<Group | null>(null);
@@ -94,7 +96,7 @@ export const GroupProvider = ({ children }: { children: ReactNode }) => {
         }
         setGroup(existingGroup);
         setMembers(mockUsers);
-        setBills(generateMockBills(existingGroup.id));
+        setBills(MOCK_BILLS);
         return existingGroup;
     }
     return null;
