@@ -3,25 +3,10 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { DollarSign, Users, PieChart, Loader2 } from 'lucide-react';
-import { generateImage } from '@/ai/flows/generate-image-flow';
 
 export default function Home() {
-  const [heroImageUrl, setHeroImageUrl] = useState("https://placehold.co/600x600.png");
-  const [isLoadingImage, setIsLoadingImage] = useState(true);
-
-  useEffect(() => {
-    generateImage({ prompt: "A modern, abstract illustration for a financial app, representing collaboration and splitting bills. Use a clean, friendly color palette with soft, rounded shapes. The style should be minimalist and approachable, conveying ease of use and trust." })
-      .then(result => {
-        setHeroImageUrl(result.imageUrl);
-      })
-      .catch(error => {
-        console.error("Failed to generate hero image:", error);
-      })
-      .finally(() => {
-        setIsLoadingImage(false);
-      });
-  }, []);
-
+  const heroImageUrl = "https://placehold.co/600x600.png";
+  const [isLoadingImage, setIsLoadingImage] = useState(false);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -77,6 +62,7 @@ export default function Home() {
                     width="600"
                     height="600"
                     alt="Hero"
+                    data-ai-hint="illustration collaboration finance"
                     className="object-cover w-full h-full"
                   />
                 )}
