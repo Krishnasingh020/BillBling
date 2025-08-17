@@ -6,6 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DollarSign, LogOut, LayoutDashboard, FileText, UserPlus, Scale } from 'lucide-react';
 import { useGroup } from '@/providers/group-provider';
+import { getInitials } from '@/lib/utils';
 
 export function AppHeader() {
   const router = useRouter();
@@ -15,15 +16,6 @@ export function AppHeader() {
     // In a real app, this would sign the user out.
     // For now, it just redirects to the landing page.
     router.push('/');
-  };
-
-  const getInitials = (name?: string | null) => {
-    if (!name) return 'U';
-    const names = name.split(' ');
-    if (names.length > 1) {
-      return `${names[0][0]}${names[1][0]}`.toUpperCase();
-    }
-    return names[0][0].toUpperCase();
   };
 
   return (
@@ -72,3 +64,5 @@ export function AppHeader() {
     </header>
   );
 }
+
+    

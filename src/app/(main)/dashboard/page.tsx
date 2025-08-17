@@ -16,24 +16,25 @@ export default function DashboardPage() {
     const { group, bills, members, addBill, user } = useGroup();
 
     const balances = useMemo(() => {
-        if (!user || members.length === 0) return { owedToMe: [], iOwe: [], groupTotal: 0, netBalances: {} };
+        if (!user || members.length === 0) return { groupTotal: 0, netBalance: 0 };
     
-        const netBalances: { [uid: string]: number } = {};
-        members.forEach(m => netBalances[m.uid] = 0);
+        let netBalance = 0;
         let groupTotal = 0;
     
         bills.forEach(bill => {
             groupTotal += bill.amount;
             if (bill.participants.length > 0) {
-              const share = bill.amount / bill.participants.length;
-              netBalances[bill.paidBy] += bill.amount;
-              bill.participants.forEach(participantId => {
-                  netBalances[participantId] -= share;
-              });
+                const share = bill.amount / bill.participants.length;
+                if (bill.paidBy === user.uid) {
+                    netBalance += bill.amount;
+                }
+                if (bill.participants.includes(user.uid)) {
+                    netBalance -= share;
+                }
             }
         });
         
-        return { owedToMe: [], iOwe: [], groupTotal, netBalances };
+        return { groupTotal, netBalance };
     }, [bills, members, user]);
 
     const getPayerName = (uid: string) => members.find(m => m.uid === uid)?.displayName || 'Unknown';
@@ -79,8 +80,8 @@ export default function DashboardPage() {
                         <Scale className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className={`text-2xl font-bold ${balances.netBalances?.[user?.uid || ''] >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                           {balances.netBalances?.[user?.uid || ''] >= 0 ? '+' : ''}${(balances.netBalances?.[user?.uid || ''] || 0).toFixed(2)}
+                        <div className={`text-2xl font-bold ${balances.netBalance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                           {balances.netBalance >= 0 ? '+' : ''}${balances.netBalance.toFixed(2)}
                         </div>
                         <p className="text-xs text-muted-foreground">You are owed money if positive</p>
                     </CardContent>
@@ -155,3 +156,5 @@ export default function DashboardPage() {
         </div>
     );
 }
+
+    

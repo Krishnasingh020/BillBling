@@ -8,15 +8,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ArrowRight, Scale, Share2 } from 'lucide-react';
 import { useGroup } from '@/providers/group-provider';
 import { Button } from '@/components/ui/button';
-
-const getInitials = (name?: string | null) => {
-    if (!name) return '?';
-    const names = name.split(' ');
-    if (names.length > 1) {
-      return `${names[0][0]}${names[1][0]}`.toUpperCase();
-    }
-    return names[0][0].toUpperCase();
-};
+import { getInitials } from '@/lib/utils';
 
 export default function BalancesPage() {
     const { bills, members } = useGroup();
@@ -164,7 +156,7 @@ export default function BalancesPage() {
                                     <TableCell className="text-right text-green-600 font-medium">+${memberBalances[member.uid].paid.toFixed(2)}</TableCell>
                                     <TableCell className="text-right text-red-600 font-medium">-${memberBalances[member.uid].owed.toFixed(2)}</TableCell>
                                     <TableCell className={`text-right font-bold ${memberBalances[member.uid].net >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                        {memberBalances[member.uid].net >= 0 ? '+' : ''}${Math.abs(memberBalances[member.uid].net).toFixed(2)}
+                                        {memberBalances[member.uid].net >= 0 ? '+' : ''}${memberBalances[member.uid].net.toFixed(2)}
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -175,3 +167,4 @@ export default function BalancesPage() {
         </div>
     );
 }
+    

@@ -1,11 +1,9 @@
 'use client';
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { DollarSign, Users, PieChart, Loader2 } from 'lucide-react';
+import { DollarSign, Users, PieChart } from 'lucide-react';
 
 export default function Home() {
-  const [isLoadingImage, setIsLoadingImage] = useState(false);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -160,3 +158,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
