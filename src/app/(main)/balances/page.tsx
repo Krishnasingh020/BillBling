@@ -5,8 +5,9 @@ import type { Bill, UserProfile } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { ArrowRight, Scale } from 'lucide-react';
+import { ArrowRight, Scale, Share2 } from 'lucide-react';
 import { useGroup } from '@/providers/group-provider';
+import { Button } from '@/components/ui/button';
 
 const getInitials = (name?: string | null) => {
     if (!name) return '?';
@@ -85,15 +86,34 @@ export default function BalancesPage() {
 
     }, [bills, members]);
     
+    const handleShareOnWhatsApp = () => {
+        const summaryLines = simplifiedDebts.map(debt => 
+            `- ${debt.from} owes ${debt.to} $${debt.amount.toFixed(2)}`
+        );
+        
+        const message = `*BillBling Settlement Summary*\n\nHere's how we can settle up:\n\n${summaryLines.join('\n')}`;
+
+        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
+    };
+
     return (
         <div className="container mx-auto p-4 md:p-6 lg:p-8">
             <Card className="mb-8">
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <Scale />
-                        Settlement Summary
-                    </CardTitle>
-                    <CardDescription>The simplest way to settle all debts in the group.</CardDescription>
+                <CardHeader className="flex flex-row items-center justify-between">
+                    <div className="space-y-1">
+                        <CardTitle className="flex items-center gap-2">
+                            <Scale />
+                            Settlement Summary
+                        </CardTitle>
+                        <CardDescription>The simplest way to settle all debts in the group.</CardDescription>
+                    </div>
+                    {simplifiedDebts.length > 0 && (
+                        <Button variant="outline" onClick={handleShareOnWhatsApp}>
+                            <Share2 className="mr-2 h-4 w-4" />
+                            Share on WhatsApp
+                        </Button>
+                    )}
                 </CardHeader>
                 <CardContent>
                     {simplifiedDebts.length > 0 ? (
