@@ -14,7 +14,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PlusCircle, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { autoBillTagging } from '@/ai/flows/bill-tagging';
 import type { UserProfile, Bill } from '@/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -23,7 +22,7 @@ import { useAuth } from '@/providers/auth-provider';
 interface AddBillDialogProps {
   members: UserProfile[];
   groupId: string;
-  onBillAdded?: (bill: Omit<Bill, 'id' | 'createdAt'>) => void;
+  onBillAdded: (bill: Omit<Bill, 'id' | 'createdAt'>) => Promise<void>;
 }
 
 export function AddBillDialog({ members, groupId, onBillAdded }: AddBillDialogProps) {
@@ -36,7 +35,6 @@ export function AddBillDialog({ members, groupId, onBillAdded }: AddBillDialogPr
   const [paidBy, setPaidBy] = useState<string>('');
   const [participants, setParticipants] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
-  const [isTagging, setIsTagging] = useState(false);
   
   const currentUserId = user?.uid;
 
@@ -48,20 +46,6 @@ export function AddBillDialog({ members, groupId, onBillAdded }: AddBillDialogPr
   }, [members, open, currentUserId]);
 
 
-  const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setDescription(value);
-    if (value.length > 5 && !category) { // Only auto-tag if category is not already set
-      setIsTagging(true);
-      autoBillTagging({ description: value })
-        .then(result => {
-          setCategory(result.category);
-        })
-        .catch(err => console.error('AI tagging failed:', err))
-        .finally(() => setIsTagging(false));
-    }
-  };
-  
   const handleParticipantChange = (uid: string) => {
     setParticipants(prev => 
       prev.includes(uid) ? prev.filter(id => id !== uid) : [...prev, uid]
@@ -94,9 +78,7 @@ export function AddBillDialog({ members, groupId, onBillAdded }: AddBillDialogPr
             participants,
         };
 
-        if (onBillAdded) {
-            onBillAdded(newBill);
-        }
+        await onBillAdded(newBill);
       
       toast({ title: 'Bill added!', description: `${description} for $${amount} has been added.` });
       setOpen(false);
@@ -136,7 +118,7 @@ export function AddBillDialog({ members, groupId, onBillAdded }: AddBillDialogPr
               <Input
                 id="description"
                 value={description}
-                onChange={handleDescriptionChange}
+                onChange={(e) => setDescription(e.target.value)}
                 placeholder="e.g. Weekly Groceries"
                 required
               />
@@ -160,9 +142,8 @@ export function AddBillDialog({ members, groupId, onBillAdded }: AddBillDialogPr
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                   className="pr-8"
-                  placeholder="e.g. Food (will be auto-tagged)"
+                  placeholder="e.g. Food"
                 />
-                {isTagging && <Loader2 className="absolute right-2 top-8 h-4 w-4 animate-spin text-muted-foreground" />}
               </div>
             <div className="space-y-2">
                 <Label>Paid by</Label>

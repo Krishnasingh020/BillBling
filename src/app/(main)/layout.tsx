@@ -1,27 +1,26 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { AppHeader } from '@/components/app-header';
 import { GroupProvider } from '@/providers/group-provider';
 import { useAuth } from '@/providers/auth-provider';
+import { Loader2 } from 'lucide-react';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const pathname = usePathname();
 
   useEffect(() => {
-    // If auth is not loading and there's no user, redirect to login page.
-    // Allow access to the landing page if they are not logged in.
     if (!loading && !user) {
       router.push('/login');
     }
-  }, [user, loading, router, pathname]);
+  }, [user, loading, router]);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin" />
         <div>Loading...</div>
       </div>
     );
@@ -29,6 +28,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   if (!user) {
     // This will be briefly visible before the redirect happens.
+    // Or it might be the case that we are already on /login or /signup
     return null;
   }
   

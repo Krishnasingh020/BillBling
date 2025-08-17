@@ -1,4 +1,3 @@
-import type { Timestamp } from 'firebase/firestore';
 
 export type UserProfile = {
     uid: string;
@@ -12,7 +11,7 @@ export type Group = {
     groupName: string;
     members: string[]; // array of user uids
     inviteCode: string;
-    createdAt: Timestamp;
+    createdAt: string; // ISO 8601 date string
 };
 
 export type Bill = {
@@ -24,7 +23,7 @@ export type Bill = {
     participants: string[]; // array of user uids
     category?: string;
     isSettlement?: boolean;
-    createdAt: Timestamp;
+    createdAt: string; // ISO 8601 date string
 };
 
 export type Balance = {

@@ -27,10 +27,11 @@ export default function GroupPage() {
         setLoadingCreate(true);
         
         try {
-            const newGroup = createGroup(groupName);
-            toast({ title: "Group Created!", description: `Welcome to ${newGroup.groupName}!` });
+            await createGroup(groupName);
+            toast({ title: "Group Created!", description: `Welcome to ${groupName}!` });
             router.push('/dashboard');
         } catch (error) {
+            console.error(error);
             toast({ variant: 'destructive', title: "Error", description: 'Could not create group.' });
         } finally {
             setLoadingCreate(false);
@@ -43,7 +44,7 @@ export default function GroupPage() {
         setLoadingJoin(true);
         
         try {
-             const joinedGroup = joinGroup(inviteCode);
+             const joinedGroup = await joinGroup(inviteCode);
              if (joinedGroup) {
                 toast({ title: "Joined Group!", description: `Welcome to ${joinedGroup.groupName}!` });
                 router.push('/dashboard');
@@ -51,6 +52,7 @@ export default function GroupPage() {
                 toast({ variant: 'destructive', title: "Error", description: 'Invalid invite code.' });
              }
         } catch(error) {
+             console.error(error);
              toast({ variant: 'destructive', title: "Error", description: 'Could not join group.' });
         } finally {
             setLoadingJoin(false);

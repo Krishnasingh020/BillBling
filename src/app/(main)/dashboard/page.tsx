@@ -2,8 +2,7 @@
 
 import { useMemo } from 'react';
 import { AddBillDialog } from '@/components/dashboard/add-bill-dialog';
-import type { Bill, UserProfile, Balance } from '@/types';
-import { Users, Receipt, Scale } from 'lucide-react';
+import { Users, Receipt, Scale, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,10 +11,11 @@ import { format } from 'date-fns';
 import { SpendingChart } from '@/components/dashboard/spending-chart';
 import { useGroup } from '@/providers/group-provider';
 import { useAuth } from '@/providers/auth-provider';
+import { getInitials } from '@/lib/utils';
 
 export default function DashboardPage() {
-    const { user, loading: authLoading } = useAuth();
-    const { group, bills, members, addBill } = useGroup();
+    const { user } = useAuth();
+    const { group, bills, members, addBill, loading } = useGroup();
 
     const balances = useMemo(() => {
         if (!user || members.length === 0) return { groupTotal: 0, netBalance: 0 };
@@ -28,9 +28,8 @@ export default function DashboardPage() {
             if (bill.participants.length > 0) {
                 const share = bill.amount / bill.participants.length;
                 if (bill.paidBy === user.uid) {
-                    netBalance += bill.amount;
-                }
-                if (bill.participants.includes(user.uid)) {
+                    netBalance += bill.amount - share * (bill.participants.length -1);
+                } else if (bill.participants.includes(user.uid)) {
                     netBalance -= share;
                 }
             }
@@ -41,10 +40,11 @@ export default function DashboardPage() {
 
     const getPayerName = (uid: string) => members.find(m => m.uid === uid)?.displayName || 'Unknown';
 
-    if (authLoading) {
+    if (loading) {
       return (
-         <div className="container mx-auto p-4 md:p-6 lg:p-8 text-center">
-            <p>Loading...</p>
+         <div className="container mx-auto p-4 md:p-6 lg:p-8 text-center flex items-center justify-center min-h-[60vh]">
+            <Loader2 className="h-8 w-8 animate-spin mr-2" />
+            <p>Loading your group...</p>
         </div>
       )
     }
@@ -139,7 +139,7 @@ export default function DashboardPage() {
                                       <div>
                                           <p className="font-semibold">{bill.description}</p>
                                           <p className="text-sm text-muted-foreground">
-                                              Paid by {getPayerName(bill.paidBy)} &bull; {format(bill.createdAt.toDate(), 'MMM d, yyyy')}
+                                              Paid by {getPayerName(bill.paidBy)} &bull; {bill.createdAt ? format(new Date(bill.createdAt), 'MMM d, yyyy') : '...'}
                                           </p>
                                       </div>
                                   </div>

@@ -7,15 +7,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DollarSign, LogOut, LayoutDashboard, FileText, UserPlus, Scale } from 'lucide-react';
 import { useAuth } from '@/providers/auth-provider';
 import { getInitials } from '@/lib/utils';
-import { auth } from '@/lib/firebase';
 
 export function AppHeader() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   const handleLogout = async () => {
-    await auth.signOut();
-    router.push('/');
+    logout();
+    router.push('/login');
   };
   
   if (!user) {
@@ -45,7 +44,6 @@ export function AppHeader() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10 rounded-full">
               <Avatar className="h-10 w-10 border-2 border-primary/50">
-                <AvatarImage src={user.photoURL || ''} alt={user.displayName || 'User'} />
                 <AvatarFallback className="bg-primary/20">{getInitials(user.displayName)}</AvatarFallback>
               </Avatar>
             </Button>
