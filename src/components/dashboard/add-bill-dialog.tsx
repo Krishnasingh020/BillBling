@@ -19,6 +19,7 @@ import type { UserProfile, Bill } from '@/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useGroup } from '@/providers/group-provider';
+import { useAuth } from '@/providers/auth-provider';
 
 interface AddBillDialogProps {
   members: UserProfile[];
@@ -28,7 +29,7 @@ interface AddBillDialogProps {
 
 export function AddBillDialog({ members, groupId, onBillAdded }: AddBillDialogProps) {
   const { toast } = useToast();
-  const { user } = useGroup();
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
@@ -38,10 +39,10 @@ export function AddBillDialog({ members, groupId, onBillAdded }: AddBillDialogPr
   const [loading, setLoading] = useState(false);
   const [isTagging, setIsTagging] = useState(false);
   
-  const currentUserId = user.uid;
+  const currentUserId = user?.uid;
 
   useEffect(() => {
-    if (members.length > 0 && open) {
+    if (members.length > 0 && open && currentUserId) {
       setPaidBy(currentUserId);
       setParticipants(members.map(m => m.uid));
     }
@@ -104,7 +105,7 @@ export function AddBillDialog({ members, groupId, onBillAdded }: AddBillDialogPr
       setDescription('');
       setAmount('');
       setCategory('');
-      setPaidBy(currentUserId);
+      if (currentUserId) setPaidBy(currentUserId);
       setParticipants(members.map(m => m.uid));
     } catch (error) {
       toast({ variant: 'destructive', title: 'Error', description: 'Could not add bill.' });

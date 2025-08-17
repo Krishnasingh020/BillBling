@@ -11,24 +11,26 @@ import {
   useEffect,
 } from "react";
 import { v4 as uuidv4 } from 'uuid';
+import { useAuth } from "./auth-provider";
+
 
 // Mock Data
-const mockUsers: UserProfile[] = [
-  { uid: 'user-1', displayName: 'Alex', email: 'alex@example.com', groupId: 'group-1' },
-  { uid: 'user-2', displayName: 'Beth', email: 'beth@example.com', groupId: 'group-1' },
-  { uid: 'user-3', displayName: 'Charlie', email: 'charlie@example.com', groupId: 'group-1' },
-  { uid: 'user-4', displayName: 'David', email: 'david@example.com', groupId: 'group-1' },
+const MOCK_OTHER_USERS: Omit<UserProfile, 'groupId'>[] = [
+  { uid: 'user-2', displayName: 'Beth', email: 'beth@example.com' },
+  { uid: 'user-3', displayName: 'Charlie', email: 'charlie@example.com' },
+  { uid: 'user-4', displayName: 'David', email: 'david@example.com' },
 ];
 
-const mockCurrentUser = mockUsers[0];
 
-const initialMockBills: Omit<Bill, 'id' | 'createdAt'>[] = [
-  { groupId: 'group-1', description: 'Monthly Rent', amount: 1200, paidBy: 'user-1', participants: ['user-1', 'user-2', 'user-3', 'user-4'], category: 'Rent' },
-  { groupId: 'group-1', description: 'Internet Bill', amount: 60, paidBy: 'user-2', participants: ['user-1', 'user-2', 'user-3', 'user-4'], category: 'Internet' },
-  { groupId: 'group-1', description: 'Groceries', amount: 150, paidBy: 'user-3', participants: ['user-1', 'user-2', 'user-3', 'user-4'], category: 'Groceries' },
-  { groupId: 'group-1', description: 'Electricity', amount: 85, paidBy: 'user-1', participants: ['user-1', 'user-2', 'user-3', 'user-4'], category: 'Utilities' },
-  { groupId: 'group-1', description: 'Dinner Out', amount: 90, paidBy: 'user-2', participants: ['user-1', 'user-2'], category: 'Food' },
-  { groupId: 'group-1', description: 'Weekend Trip Gas', amount: 50, paidBy: 'user-2', participants: ['user-1', 'user-2'], category: 'Travel' },
+const MOCK_EXISTING_GROUP_ID = 'group-1';
+
+const initialMockBills: Omit<Bill, 'id' | 'createdAt' | 'groupId'>[] = [
+  { description: 'Monthly Rent', amount: 1200, paidBy: 'user-1', participants: ['user-1', 'user-2', 'user-3', 'user-4'], category: 'Rent' },
+  { description: 'Internet Bill', amount: 60, paidBy: 'user-2', participants: ['user-1', 'user-2', 'user-3', 'user-4'], category: 'Internet' },
+  { description: 'Groceries', amount: 150, paidBy: 'user-3', participants: ['user-1', 'user-2', 'user-3', 'user-4'], category: 'Groceries' },
+  { description: 'Electricity', amount: 85, paidBy: 'user-1', participants: ['user-1', 'user-2', 'user-3', 'user-4'], category: 'Utilities' },
+  { description: 'Dinner Out', amount: 90, paidBy: 'user-2', participants: ['user-1', 'user-2'], category: 'Food' },
+  { description: 'Weekend Trip Gas', amount: 50, paidBy: 'user-2', participants: ['user-1', 'user-2'], category: 'Travel' },
 ];
 
 const generateInviteCode = () => {
@@ -37,7 +39,6 @@ const generateInviteCode = () => {
 
 
 type GroupContextType = {
-  user: UserProfile;
   group: Group | null;
   members: UserProfile[];
   bills: Bill[];
@@ -48,12 +49,12 @@ type GroupContextType = {
 
 const GroupContext = createContext<GroupContextType | null>(null);
 
-const MOCK_EXISTING_GROUP_ID = 'group-1';
 const MOCK_EXISTING_INVITE_CODE = 'FUN123';
 
 // Pre-generate mock bills to avoid re-calculating on each render
-const MOCK_BILLS = initialMockBills.map((bill, index) => ({
+const MOCK_BILLS: Bill[] = initialMockBills.map((bill, index) => ({
     ...bill,
+    // Note: The first mock user in joinGroup will be user-1
     groupId: MOCK_EXISTING_GROUP_ID,
     id: uuidv4(),
     // @ts-ignore
@@ -62,12 +63,22 @@ const MOCK_BILLS = initialMockBills.map((bill, index) => ({
 
 
 export const GroupProvider = ({ children }: { children: ReactNode }) => {
+  const { user } = useAuth();
+
   const [group, setGroup] = useState<Group | null>(null);
   const [members, setMembers] = useState<UserProfile[]>([]);
   const [bills, setBills] = useState<Bill[]>([]);
-  const user = mockCurrentUser;
-
+  
   const createGroup = (groupName: string) => {
+    if (!user) throw new Error("User must be authenticated to create a group.");
+
+    const currentUserProfile: UserProfile = {
+        uid: user.uid,
+        displayName: user.displayName || 'Anonymous',
+        email: user.email || '',
+        groupId: null,
+    };
+
     const newGroupId = uuidv4();
     const newGroup: Group = {
         id: newGroupId,
@@ -77,25 +88,43 @@ export const GroupProvider = ({ children }: { children: ReactNode }) => {
         // @ts-ignore
         createdAt: { toDate: () => new Date() },
     };
+    
+    currentUserProfile.groupId = newGroupId;
+
     setGroup(newGroup);
-    setMembers([user]);
+    setMembers([currentUserProfile]);
     setBills([]); // Start with no bills for a new group
     return newGroup;
   }
   
   const joinGroup = (inviteCode: string) => {
+    if (!user) throw new Error("User must be authenticated to join a group.");
+    
     // For this mock, we only have one joinable group
     if (inviteCode === MOCK_EXISTING_INVITE_CODE) {
+        
+        const currentUserAsMember1: UserProfile = {
+            uid: 'user-1', // Overwrite current auth user to match mock data
+            displayName: user.displayName || 'Anonymous',
+            email: user.email || '',
+            groupId: MOCK_EXISTING_GROUP_ID,
+        };
+
+        const allMembers: UserProfile[] = [
+            currentUserAsMember1,
+            ...MOCK_OTHER_USERS.map(u => ({ ...u, groupId: MOCK_EXISTING_GROUP_ID }))
+        ];
+
         const existingGroup: Group = {
             id: MOCK_EXISTING_GROUP_ID,
             groupName: 'The Fun House',
-            members: mockUsers.map(u => u.uid),
+            members: allMembers.map(m => m.uid),
             inviteCode: MOCK_EXISTING_INVITE_CODE,
             // @ts-ignore
             createdAt: { toDate: () => new Date() }
         }
         setGroup(existingGroup);
-        setMembers(mockUsers);
+        setMembers(allMembers);
         setBills(MOCK_BILLS);
         return existingGroup;
     }
@@ -114,14 +143,13 @@ export const GroupProvider = ({ children }: { children: ReactNode }) => {
 
 
   const value = useMemo(() => ({
-    user,
     group,
     members,
     bills,
     createGroup,
     joinGroup,
     addBill,
-  }), [user, group, members, bills]);
+  }), [group, members, bills]);
 
   return (
     <GroupContext.Provider value={value}>

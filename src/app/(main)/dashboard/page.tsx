@@ -11,9 +11,11 @@ import Link from 'next/link';
 import { format } from 'date-fns';
 import { SpendingChart } from '@/components/dashboard/spending-chart';
 import { useGroup } from '@/providers/group-provider';
+import { useAuth } from '@/providers/auth-provider';
 
 export default function DashboardPage() {
-    const { group, bills, members, addBill, user } = useGroup();
+    const { user, loading: authLoading } = useAuth();
+    const { group, bills, members, addBill } = useGroup();
 
     const balances = useMemo(() => {
         if (!user || members.length === 0) return { groupTotal: 0, netBalance: 0 };
@@ -39,6 +41,14 @@ export default function DashboardPage() {
 
     const getPayerName = (uid: string) => members.find(m => m.uid === uid)?.displayName || 'Unknown';
 
+    if (authLoading) {
+      return (
+         <div className="container mx-auto p-4 md:p-6 lg:p-8 text-center">
+            <p>Loading...</p>
+        </div>
+      )
+    }
+    
     if (!group) {
       return (
          <div className="container mx-auto p-4 md:p-6 lg:p-8 text-center">
@@ -95,7 +105,7 @@ export default function DashboardPage() {
                         <div className="flex -space-x-2 overflow-hidden p-2">
                             {members.map(m => (
                                 <div key={m.uid} title={m.displayName || ''} className="inline-block h-9 w-9 rounded-full ring-2 ring-background text-primary bg-primary/20 flex items-center justify-center font-bold">
-                                    {m.displayName?.charAt(0).toUpperCase()}
+                                    {getInitials(m.displayName)}
                                 </div>
                             ))}
                         </div>
@@ -156,5 +166,3 @@ export default function DashboardPage() {
         </div>
     );
 }
-
-    

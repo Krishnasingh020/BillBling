@@ -5,18 +5,22 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DollarSign, LogOut, LayoutDashboard, FileText, UserPlus, Scale } from 'lucide-react';
-import { useGroup } from '@/providers/group-provider';
+import { useAuth } from '@/providers/auth-provider';
 import { getInitials } from '@/lib/utils';
+import { auth } from '@/lib/firebase';
 
 export function AppHeader() {
   const router = useRouter();
-  const { user } = useGroup();
+  const { user } = useAuth();
 
   const handleLogout = async () => {
-    // In a real app, this would sign the user out.
-    // For now, it just redirects to the landing page.
+    await auth.signOut();
     router.push('/');
   };
+  
+  if (!user) {
+    return null;
+  }
 
   return (
     <header className="px-4 lg:px-6 h-16 flex items-center bg-background/80 backdrop-blur-sm sticky top-0 z-50 border-b">
@@ -41,7 +45,7 @@ export function AppHeader() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10 rounded-full">
               <Avatar className="h-10 w-10 border-2 border-primary/50">
-                <AvatarImage src={''} alt={user.displayName || 'User'} />
+                <AvatarImage src={user.photoURL || ''} alt={user.displayName || 'User'} />
                 <AvatarFallback className="bg-primary/20">{getInitials(user.displayName)}</AvatarFallback>
               </Avatar>
             </Button>
@@ -64,5 +68,3 @@ export function AppHeader() {
     </header>
   );
 }
-
-    
