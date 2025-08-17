@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { DollarSign, Users, PieChart, Loader2 } from 'lucide-react';
 
 export default function Home() {
-  const heroImageUrl = "https://placehold.co/600x600.png";
   const [isLoadingImage, setIsLoadingImage] = useState(false);
 
   return (
@@ -50,15 +49,41 @@ export default function Home() {
                   </Button>
                 </div>
               </div>
-               <div className="mx-auto aspect-square overflow-hidden rounded-xl flex items-center justify-center bg-muted/50">
-                <img
-                  src="https://placehold.co/600x600/2196F3/FFFFFF?text=BillBling"
-                  width="600"
-                  height="600"
-                  alt="Abstract illustration showing financial collaboration"
-                  data-ai-hint="illustration collaboration finance"
-                  className="object-cover w-full h-full"
-                />
+               <div className="mx-auto aspect-square overflow-hidden rounded-xl flex items-center justify-center bg-muted/50 p-8">
+                <svg
+                  className="w-full h-full text-primary"
+                  viewBox="0 0 200 200"
+                  xmlns="http://www.w3.org/2000/svg"
+                  data-ai-hint="illustration sharing money smartphone"
+                >
+                  <g transform="translate(100 100)">
+                    {/* Phone */}
+                    <path
+                      d="M-45 -80 h 90 a 10 10 0 0 1 10 10 v 140 a 10 10 0 0 1 -10 10 h -90 a 10 10 0 0 1 -10 -10 v -140 a 10 10 0 0 1 10 -10 Z"
+                      fill="hsl(var(--card))"
+                      stroke="hsl(var(--foreground))"
+                      strokeWidth="4"
+                    />
+                    <path d="M-20 -70 h 40" stroke="hsl(var(--foreground))" strokeWidth="3" strokeLinecap="round" />
+
+                    {/* Happy person 1 */}
+                    <circle cx="-60" cy="0" r="15" fill="hsl(var(--primary))" opacity="0.2" />
+                    <circle cx="-60" cy="0" r="8" fill="hsl(var(--primary))" />
+                    <path d="M-60 8 q 10 15 20 0" fill="none" stroke="hsl(var(--primary))" strokeWidth="2" />
+
+                     {/* Happy person 2 */}
+                    <circle cx="60" cy="0" r="15" fill="hsl(var(--accent))" opacity="0.2" />
+                    <circle cx="60" cy="0" r="8" fill="hsl(var(--accent))" />
+                    <path d="M60 8 q -10 15 -20 0" fill="none" stroke="hsl(var(--accent))" strokeWidth="2" />
+                    
+                    {/* Sharing lines */}
+                    <path d="M-45 -20 q 45 -30 90 0" fill="none" stroke="hsl(var(--muted-foreground))" strokeWidth="3" strokeDasharray="5,5" />
+                     <path d="M-45 20 q 45 30 90 0" fill="none" stroke="hsl(var(--muted-foreground))" strokeWidth="3" strokeDasharray="5,5" />
+
+                    {/* Dollar sign */}
+                    <text x="0" y="5" fontSize="40" fontWeight="bold" textAnchor="middle" fill="hsl(var(--primary))" >$</text>
+                  </g>
+                </svg>
               </div>
             </div>
           </div>
