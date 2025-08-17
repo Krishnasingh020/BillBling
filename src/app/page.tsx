@@ -52,7 +52,7 @@ export default function Home() {
               </div>
                <div className="mx-auto aspect-square overflow-hidden rounded-xl flex items-center justify-center bg-muted/50">
                 <img
-                  src="https://placehold.co/600x600/E3F2FD/4285F4?text=BillBling"
+                  src="https://placehold.co/600x600/2196F3/FFFFFF?text=BillBling"
                   width="600"
                   height="600"
                   alt="Abstract illustration showing financial collaboration"
