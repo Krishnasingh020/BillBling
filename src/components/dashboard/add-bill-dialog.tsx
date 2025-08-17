@@ -18,7 +18,6 @@ import { autoBillTagging } from '@/ai/flows/bill-tagging';
 import type { UserProfile, Bill } from '@/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useGroup } from '@/providers/group-provider';
 import { useAuth } from '@/providers/auth-provider';
 
 interface AddBillDialogProps {
