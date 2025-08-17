@@ -51,21 +51,14 @@ export default function Home() {
                 </div>
               </div>
                <div className="mx-auto aspect-square overflow-hidden rounded-xl flex items-center justify-center bg-muted/50">
-                {isLoadingImage ? (
-                  <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                    <Loader2 className="h-10 w-10 animate-spin" />
-                    <p>Generating illustration...</p>
-                  </div>
-                ) : (
-                  <img
-                    src={heroImageUrl}
-                    width="600"
-                    height="600"
-                    alt="Hero"
-                    data-ai-hint="illustration collaboration finance"
-                    className="object-cover w-full h-full"
-                  />
-                )}
+                <img
+                  src="https://placehold.co/600x600/E3F2FD/4285F4?text=BillBling"
+                  width="600"
+                  height="600"
+                  alt="Abstract illustration showing financial collaboration"
+                  data-ai-hint="illustration collaboration finance"
+                  className="object-cover w-full h-full"
+                />
               </div>
             </div>
           </div>
