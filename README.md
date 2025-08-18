@@ -7,12 +7,14 @@ This project helps users **add expenses, split bills, track balances, and manage
 
 ## ✨ Features
 
-- 🔑 **User Authentication** – Register/Login for each flatmate
-- 🧾 **Add & Manage Bills** – Track rent, utilities, groceries, and shared expenses
-- 🔄 **Auto Bill Splitting** – Automatically split costs among flatmates
-- 📊 **Expense Dashboard** – View who owes what at a glance
-- 📱 **Responsive Design** – Works smoothly on desktop & mobile
-- 📜 **History & Settlements** – Keep records of payments and settled balances
+- **100% Free & Serverless**: No backend, no database, no hosting fees. Runs entirely in your browser.
+- **Offline-First**: Works seamlessly even without an internet connection. Your data is always accessible.
+- **Group Management**: Easily create groups and invite your flatmates with a unique code.
+- **Bill Tracking**: Add and categorize shared expenses to keep a clear record of your spending.
+- **Simplified Balances**: A clean dashboard instantly shows who owes whom, removing any confusion.
+- **WhatsApp Integration**: Share settlement summaries with your group in a single click.
+- **Light & Dark Modes**: A sleek, modern UI with support for both light and dark themes.
+
 
 ---
 
@@ -68,6 +70,22 @@ This project helps users **add expenses, split bills, track balances, and manage
   - public/ → Static assets
   - package.json → Dependencies & scripts
   - tailwind.config.ts → Tailwind setup
+---
+## Getting Started
+To run the project locally:
+
+    Clone the repository:
+
+    git clone https://github.com/Krishnasingh020/billbling.git
+
+Install dependencies:
+
+    npm install
+    
+    Run the development server:
+    
+    npm run dev
+
 
 ---
 ## 🤝 Contributing
