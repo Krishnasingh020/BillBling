@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DollarSign, LogOut, LayoutDashboard, FileText, UserPlus, Scale } from 'lucide-react';
 import { useAuth } from '@/providers/auth-provider';
 import { getInitials } from '@/lib/utils';
+import { ThemeToggle } from './theme-toggle';
 
 export function AppHeader() {
   const router = useRouter();
@@ -40,6 +41,7 @@ export function AppHeader() {
          <Button variant="ghost" size="sm" asChild>
             <Link href="/group"><UserPlus className="mr-2"/>Group</Link>
         </Button>
+        <ThemeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10 rounded-full">
