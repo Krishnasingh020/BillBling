@@ -86,9 +86,6 @@ Install dependencies:
     
     npm run dev
 
-<<<<<<< HEAD
-
-=======
 ---
 ## Live Link
 
