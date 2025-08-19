@@ -93,7 +93,6 @@ Install dependencies:
 ## Live Link
 
   https://bill-bling.vercel.app/
->>>>>>> 9267082 (initial commit)
 ---
 ## 🤝 Contributing
 
